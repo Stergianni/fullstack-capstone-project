@@ -1,47 +1,54 @@
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
+const axios = require('axios');
+const logger = require('./logger');
+const expressPino = require('express-pino-logger')({ logger });
 const natural = require("natural");
 
 const app = express();
-app.use(express.json()); // To parse JSON request bodies
+const port = process.env.PORT || 3000;
 
-// POST /sentiment endpoint
-app.post("/sentiment", (req, res) => {
+app.use(express.json());
+app.use(expressPino);
+
+// Define the sentiment analysis route
+app.post('/sentiment', async (req, res) => {
+    const { sentence } = req.query;
+
+
+    if (!sentence) {
+        logger.error('No sentence provided');
+        return res.status(400).json({ error: 'No sentence provided' });
+    }
+
+    // Initialize the sentiment analyzer with the Natural's PorterStemmer and "English" language
+    const Analyzer = natural.SentimentAnalyzer;
+    const stemmer = natural.PorterStemmer;
+    const analyzer = new Analyzer("English", stemmer, "afinn");
+
+    // Perform sentiment analysis
     try {
-        // Extract sentence parameter from the request body
-        const { sentence } = req.body;
-
-        // Check if the sentence is provided
-        if (!sentence) {
-            return res.status(400).json({ error: "Sentence parameter is required." });
-        }
-
-        // Process the response using Natural Sentiment Analysis
-        const analyzer = new natural.SentimentAnalyzer("English", natural.PorterStemmer, "afinn");
-        const sentimentScore = analyzer.getSentiment(sentence.split(" "));
+        const analysisResult = analyzer.getSentiment(sentence.split(' '));
 
         let sentiment = "neutral";
 
-        // Determine sentiment based on score
-        if (sentimentScore < 0) {
+        if (analysisResult < 0) {
             sentiment = "negative";
-        } else if (sentimentScore > 0.33) {
+        } else if (analysisResult > 0.33) {
             sentiment = "positive";
         }
 
-        // Return the success response
-        res.status(200).json({
-            sentimentScore: sentimentScore,
-            sentiment: sentiment,
-        });
+        // Logging the result
+        logger.info(`Sentiment analysis result: ${analysisResult}`);
+        // Responding with the sentiment analysis result
+        res.status(200).json({ sentimentScore: analysisResult, sentiment: sentiment });
     } catch (error) {
-        // Handle errors
-        console.error("Error analyzing sentiment:", error);
-        res.status(500).json({ error: "Something went wrong with sentiment analysis." });
+        logger.error(`Error performing sentiment analysis: ${error}`);
+        res.status(500).json({ message: 'Error performing sentiment analysis' });
     }
 });
 
 // Start the server
-const port = 3000;
 app.listen(port, () => {
-    console.log(`Sentiment Analysis service running on port ${port}`);
+    logger.info(`Server running on port ${port}`);
 });
