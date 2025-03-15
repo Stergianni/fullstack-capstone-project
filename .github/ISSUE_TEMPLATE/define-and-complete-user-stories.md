@@ -3,7 +3,7 @@ name: Define and complete user stories
 about: 'User Story: As a developer, I want to document clear user stories so that
   the team has a well-defined backlog.'
 title: ''
-labels: ''
+labels: new
 assignees: ''
 
 ---

@@ -3,7 +3,7 @@ name: 'Build the landing page '
 about: 'User Story: As an user, I want to see a landing page with navigation so that
   I can explore the site.'
 title: ''
-labels: ''
+labels: new
 assignees: ''
 
 ---

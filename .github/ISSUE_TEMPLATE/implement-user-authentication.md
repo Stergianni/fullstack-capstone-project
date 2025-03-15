@@ -2,7 +2,7 @@
 name: Implement user authentication
 about: 'User Story: As an user, I want to sign up, log in, and log out securely.'
 title: ''
-labels: ''
+labels: new
 assignees: ''
 
 ---

@@ -3,7 +3,7 @@ name: Enable user comments
 about: 'User Story: As an user, I want to comment on gifts so that I can share my
   thoughts.'
 title: ''
-labels: ''
+labels: new
 assignees: ''
 
 ---

@@ -3,7 +3,7 @@ name: Display gift details
 about: 'User Story: As an user, I want to view gift details so that I can see full
   information about a gift.'
 title: ''
-labels: ''
+labels: new
 assignees: ''
 
 ---

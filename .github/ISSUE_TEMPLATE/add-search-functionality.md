@@ -3,7 +3,7 @@ name: Add search functionality
 about: 'User Story: As an user, I want to search for gifts so that I can quickly find
   what I’m looking for.'
 title: ''
-labels: ''
+labels: new
 assignees: ''
 
 ---
