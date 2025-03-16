@@ -51,3 +51,4 @@ jobs:
           npm install
           npm run build
           echo "Client-side build successfully"
+/*jshint esversion: 8 */
