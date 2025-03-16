@@ -15,7 +15,7 @@ router.get('/', async (req, res, next) => {
         const gifts = await collection.find({}).toArray();
         res.json(gifts);
     } catch (e) {
-        logger.console.error('oops something went wrong', e)
+        logger.console.error('oops something went wrong', e); // <-- Added semicolon
         next(e);
     }
 });
@@ -37,7 +37,6 @@ router.get('/:id', async (req, res, next) => {
         next(e);
     }
 });
-
 
 // Add a new gift
 router.post('/', async (req, res, next) => {
