@@ -31,7 +31,7 @@ jobs:
           find ./giftlink-backend -name giftRoutes.js -exec jshint {} +
           find ./giftlink-backend -name searchRoutes.js -exec jshint {} +
           echo "Linted all the js files successfully"
-
+  
   client_build:
       name: Build client
       runs-on: ubuntu-latest
@@ -51,5 +51,3 @@ jobs:
           npm install
           npm run build
           echo "Client-side build successfully"
-          
-/*jshint esversion: 8 */
