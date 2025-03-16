@@ -1,90 +1,89 @@
 import React, { useState } from 'react';
-import './RegisterPage.css';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../context/AuthContext';
+import { urlConfig } from '../../config';
 
-function RegisterPage() {
-    // Step 2: Define useState variables for firstName, lastName, email, and password
+const RegisterPage = () => {
+    // Step 4: Include states for user input and error message
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showerr, setShowerr] = useState('');
 
-    // Step 4: Define handleRegister function
+    // Step 5: Create local variables for `navigate` and `setIsLoggedIn`
+    const navigate = useNavigate();
+    const { setIsLoggedIn } = useAppContext();
+
+    // Step 6: Implement `handleRegister` function
     const handleRegister = async () => {
-        console.log("Register invoked");
-        console.log(`First Name: ${firstName}`);
-        console.log(`Last Name: ${lastName}`);
-        console.log(`Email: ${email}`);
-        console.log(`Password: ${password}`);
-    }
+        try {
+            // Step 7: Set POST method
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
+                method: 'POST', // Set the method to POST
+                headers: {
+                    'Content-Type': 'application/json', // Set the headers to accept JSON
+                },
+                // Step 8: Set the body to send user details
+                body: JSON.stringify({
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: password,
+                }),
+            });
+
+            const data = await response.json(); // Parse the response to JSON
+
+            // Check if the registration was successful
+            if (response.ok) {
+                // Step 9: Save the JWT token to sessionStorage
+                sessionStorage.setItem('authToken', data.authtoken);
+
+                // Update the global logged-in status
+                setIsLoggedIn(true);
+
+                // Step 10: Redirect to the app's main page after successful registration
+                navigate('/app'); // Redirect to /app
+            } else {
+                // If registration fails, show error message
+                setShowerr(data.error || 'Registration failed, please try again.');
+            }
+        } catch (e) {
+            console.log("Error during registration: " + e.message);
+            setShowerr('An error occurred while registering, please try again.');
+        }
+    };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6 col-lg-4">
-                    <div className="register-card p-4 border rounded">
-                        <h2 className="text-center mb-4 font-weight-bold">Register</h2>
-                        
-                        {/* Step 5: Create input elements for firstName, lastName, email, and password */}
-                        <div className="mb-4">
-                            <label htmlFor="firstName" className="form-label">First Name</label><br />
-                            <input
-                                id="firstName"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter your first name"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                            />
-                        </div>
-                        
-                        <div className="mb-4">
-                            <label htmlFor="lastName" className="form-label">Last Name</label><br />
-                            <input
-                                id="lastName"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter your last name"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="mb-4">
-                            <label htmlFor="email" className="form-label">Email</label><br />
-                            <input
-                                id="email"
-                                type="email"
-                                className="form-control"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="mb-4">
-                            <label htmlFor="password" className="form-label">Password</label><br />
-                            <input
-                                id="password"
-                                type="password"
-                                className="form-control"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Step 6: Create the Register button */}
-                        <button className="btn btn-primary w-100 mb-3" onClick={handleRegister}>Register</button>
-
-                        {/* Link to the Login page */}
-                        <p className="mt-4 text-center">
-                            Already a member? <a href="/app/login" className="text-primary">Login</a>
-                        </p>
-                    </div>
+        <div>
+            <h2>Register</h2>
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                handleRegister();
+            }}>
+                <div>
+                    <label>First Name</label>
+                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
                 </div>
-            </div>
+                <div>
+                    <label>Last Name</label>
+                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+                <div>
+                    <label>Password</label>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                </div>
+                <button type="submit">Register</button>
+            </form>
+
+            {showerr && <p style={{ color: 'red' }}>{showerr}</p>} {/* Display error message if any */}
         </div>
     );
-}
+};
 
 export default RegisterPage;
