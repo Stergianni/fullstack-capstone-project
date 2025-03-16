@@ -1,4 +1,5 @@
-/* jshint esversion: 6, moz: true */
+/* jshint esversion: 8 */
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainPage from './components/MainPage/MainPage';

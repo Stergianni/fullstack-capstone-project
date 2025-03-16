@@ -1,3 +1,5 @@
+/* jshint esversion: 8 */
+
 import React, { createContext, useState, useContext } from 'react';
 
 const AppContext = createContext();
