@@ -7,42 +7,45 @@ const pinoLogger = require('./logger');
 const connectToDatabase = require('./models/db');
 const {loadData} = require("./util/import-mongo/index");
 
-
 const app = express();
-app.use("*",cors());
+app.use("*", cors()); // Enable CORS for all routes
 const port = 3060;
 
-// Connect to MongoDB; we just do this one time
-connectToDatabase().then(() => {
+// Connect to MongoDB
+connectToDatabase()
+  .then(() => {
     pinoLogger.info('Connected to DB');
-})
-    .catch((e) => console.error('Failed to connect to DB', e));
+  })
+  .catch((e) => console.error('Failed to connect to DB', e));
 
+app.use(express.json()); // Parse JSON request bodies
 
-app.use(express.json());
-
-// Route files
+// Import the routes
 const giftRoutes = require('./routes/giftRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const authRoutes = require('./routes/authRoutes'); // Import auth routes
+
 const pinoHttp = require('pino-http');
 const logger = require('./logger');
 
 app.use(pinoHttp({ logger }));
 
-// Use Routes
+// Use the routes
 app.use('/api/gifts', giftRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/auth', authRoutes); // Add the auth routes
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).send('Internal Server Error');
+  console.error(err);
+  res.status(500).send('Internal Server Error');
 });
 
-app.get("/",(req,res)=>{
-    res.send("Inside the server")
-})
+// Test route
+app.get("/", (req, res) => {
+  res.send("Inside the server");
+});
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
