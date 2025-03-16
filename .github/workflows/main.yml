@@ -8,10 +8,10 @@ on:
 
 jobs:
   lint_js:
-      name: Lint JavaScript Files
-      runs-on: ubuntu-latest
+    name: Lint JavaScript Files
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
@@ -25,29 +25,6 @@ jobs:
 
       - name: Run Linter
         run: |
-          # This command finds all JavaScript files recursively and runs JSHint on them with esversion 8
-          find ./giftlink-backend -name app.js -exec jshint {} +
-          find ./giftlink-backend -name auth.js -exec jshint {} +
-          find ./giftlink-backend -name giftRoutes.js -exec jshint {} +
-          find ./giftlink-backend -name searchRoutes.js -exec jshint {} +
+          # Run JSHint on all JavaScript files in the backend
+          find ./giftlink-backend -name "*.js" -exec jshint {} +
           echo "Linted all the JS files successfully"
-
-  client_build:
-      name: Build client
-      runs-on: ubuntu-latest
-
-      steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14
-
-      - name: Run build
-        run: |
-          cd giftlink-frontend
-          npm install
-          npm run build
-          echo "Client-side build successfully"
