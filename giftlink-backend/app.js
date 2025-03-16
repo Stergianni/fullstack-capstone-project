@@ -1,4 +1,4 @@
-/* jshint esversion: 8, moz: true */
+/* jshint esversion: 8 */
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
