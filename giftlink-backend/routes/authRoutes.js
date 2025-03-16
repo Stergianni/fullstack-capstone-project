@@ -18,7 +18,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 router.post('/register', [
   // Validate the incoming request body
   body('email').isEmail().withMessage('Please enter a valid email'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('firstName').not().isEmpty().withMessage('First name is required'),
+  body('lastName').not().isEmpty().withMessage('Last name is required'),
 ], async (req, res) => {
   const errors = validationResult(req);
 
@@ -27,49 +29,48 @@ router.post('/register', [
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password } = req.body;
+  const { email, password, firstName, lastName } = req.body;
 
   try {
-    // Check if the user already exists
-    logger.info(`Checking if user with email ${email} already exists...`);
+    // Task 1: Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`
     const db = await connectToDatabase();
-    const existingUser = await db.collection('users').findOne({ email });
+    // Task 2: Access MongoDB collection
+    const collection = db.collection('users');
 
-    if (existingUser) {
-      logger.info(`User already exists: ${email}`);
+    // Task 3: Check for existing email ID
+    const existingEmail = await collection.findOne({ email });
+
+    if (existingEmail) {
+      logger.info(`User already exists with email: ${email}`);
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Hash the password
-    logger.info('Hashing the password...');
+    // Task 4: Save user details in the database
     const salt = await bcryptjs.genSalt(10);
-    const hashedPassword = await bcryptjs.hash(password, salt);
+    const hash = await bcryptjs.hash(password, salt);
 
-    // Create new user object
-    const newUser = {
+    const newUser = await collection.insertOne({
       email,
-      password: hashedPassword
+      firstName,
+      lastName,
+      password: hash,
+      createdAt: new Date(),
+    });
+
+    // Task 5: Create JWT authentication with user._id as payload
+    const payload = {
+      user: {
+        id: newUser.insertedId,
+      },
     };
 
-    // Insert the new user into the database
-    logger.info('Inserting new user into database...');
-    const result = await db.collection('users').insertOne(newUser);
+    const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-    if (!result.acknowledged) {
-      logger.error('Failed to insert new user into database');
-      return res.status(500).json({ message: 'Failed to register user' });
-    }
-
-    // Generate JWT token
-    logger.info('Generating JWT token...');
-    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: '1h' });
-
-    // Send success response with the JWT token
     logger.info('User registered successfully');
-    res.status(201).json({ message: 'User registered successfully', token });
-  } catch (error) {
-    logger.error('Error registering user:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.json({ authtoken, email });
+  } catch (e) {
+    logger.error('Error registering user:', e);
+    return res.status(500).send('Internal server error');
   }
 });
 
