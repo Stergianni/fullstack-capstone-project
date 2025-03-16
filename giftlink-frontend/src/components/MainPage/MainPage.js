@@ -1,3 +1,4 @@
+/* jshint esversion: 8, moz: true */
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 //import urlConfig from '../config/urlConfig';

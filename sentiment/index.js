@@ -1,3 +1,4 @@
+/* jshint esversion: 8, moz: true */
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');

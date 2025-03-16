@@ -1,3 +1,4 @@
+/* jshint esversion: 8, moz: true */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AuthContext';
