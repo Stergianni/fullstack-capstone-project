@@ -18,13 +18,12 @@ const RegisterPage = () => {
     // Step 6: Implement `handleRegister` function
     const handleRegister = async () => {
         try {
-            // Step 7: Set POST method
+            // Step 1: Call the backend API
             const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
-                method: 'POST', // Set the method to POST
+                method: 'POST', // Set method as POST
                 headers: {
-                    'Content-Type': 'application/json', // Set the headers to accept JSON
+                    'Content-Type': 'application/json', // Set headers to accept JSON
                 },
-                // Step 8: Set the body to send user details
                 body: JSON.stringify({
                     firstName: firstName,
                     lastName: lastName,
@@ -33,25 +32,32 @@ const RegisterPage = () => {
                 }),
             });
 
-            const data = await response.json(); // Parse the response to JSON
+            const json = await response.json(); // Step 1: Access data coming from the fetch API
 
-            // Check if the registration was successful
+            // Step 2: Set user details if registration is successful
             if (response.ok) {
-                // Step 9: Save the JWT token to sessionStorage
-                sessionStorage.setItem('authToken', data.authtoken);
+                // Save the auth token and user info in session storage
+                sessionStorage.setItem('auth-token', json.authtoken);
+                sessionStorage.setItem('name', firstName); // Store the user's first name
+                sessionStorage.setItem('email', json.email); // Store the user's email
 
-                // Update the global logged-in status
-                setIsLoggedIn(true);
+                // Step 3: Set the state of the user to logged in using useAppContext
+                setIsLoggedIn(true); // Update global state to logged in
 
-                // Step 10: Redirect to the app's main page after successful registration
-                navigate('/app'); // Redirect to /app
+                // Step 4: Navigate to the MainPage after logging in
+                navigate('/app'); // Redirect to /app after successful registration
             } else {
-                // If registration fails, show error message
-                setShowerr(data.error || 'Registration failed, please try again.');
+                // Step 5: Set an error message if registration fails
+                if (json.error) {
+                    setShowerr(json.error); // Set error message from backend response
+                }
             }
+
         } catch (e) {
             console.log("Error during registration: " + e.message);
-            setShowerr('An error occurred while registering, please try again.');
+
+            // Step 5: Set an error message if an unexpected error occurs
+            setShowerr('An unexpected error occurred. Please try again later.');
         }
     };
 
@@ -81,7 +87,7 @@ const RegisterPage = () => {
                 <button type="submit">Register</button>
             </form>
 
-            {showerr && <p style={{ color: 'red' }}>{showerr}</p>} {/* Display error message if any */}
+            {showerr && <div className="text-danger">{showerr}</div>} {/* Display error message if any */}
         </div>
     );
 };
