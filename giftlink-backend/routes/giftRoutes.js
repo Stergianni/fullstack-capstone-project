@@ -1,3 +1,5 @@
+/* jshint esversion: 8 */
+
 const express = require('express');
 const router = express.Router();
 const connectToDatabase = require('../models/db');
@@ -8,12 +10,11 @@ router.get('/', async (req, res, next) => {
     logger.info('/ called');
     try {
         const db = await connectToDatabase();
-
         const collection = db.collection("gifts");
         const gifts = await collection.find({}).toArray();
         res.json(gifts);
     } catch (e) {
-        logger.console.error('oops something went wrong', e)
+        logger.error('Oops! Something went wrong', e);
         next(e);
     }
 });
@@ -35,7 +36,6 @@ router.get('/:id', async (req, res, next) => {
         next(e);
     }
 });
-
 
 // Add a new gift
 router.post('/', async (req, res, next) => {
